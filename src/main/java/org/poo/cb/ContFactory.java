@@ -11,7 +11,6 @@ public class ContFactory {
         return instantaUnica;
     }
 
-
     public Cont creazaCont(String type, float suma) {
         switch (type) {
             case "USD":

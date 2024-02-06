@@ -5,4 +5,3 @@ public class EroareEmailNuExista extends Throwable {
         System.out.println("User with " + email + " doesn't exist");
     }
 }
-

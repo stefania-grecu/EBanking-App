@@ -3,6 +3,8 @@ package org.poo.cb;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -18,6 +20,7 @@ public class Main {
             System.out.println("Running Main");
         } else {
             ArrayList<Utilizator> utilizatori = new ArrayList<>();
+            CoadaComenzi coada = new CoadaComenzi();
 
             String fileExchangeRates = "src/main/resources/" + args[0];
             String[][] valoare = new String[6][6];
@@ -33,21 +36,27 @@ public class Main {
                 e.printStackTrace();
             }
 
+            //citire din fisier
             String fileStockValues = "src/main/resources/" + args[1];
-            //String[][] actData = new String[][];
-            i = 0;
+            String[] x = new String[11];
+            ArrayList<Actiuni> actiuni = new ArrayList<>();
 
-//            try (BufferedReader br = new BufferedReader(new FileReader(fileStockValues))) {
-//                String line;
-//                while ((line = br.readLine()) != null) {
-//                    valoare[i] = line.split(",");
-//                    for(int x = 0; x < 6; x++)
-//                        System.out.print(valoare[i][x] + " ");
-//                    i++;
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+            try (BufferedReader b = new BufferedReader(new FileReader(fileStockValues))) {
+                String l;
+                //citim prima linie pentru a o elimina;
+                l = b.readLine();
+                while ((l = b.readLine()) != null) {
+                    x = l.split(",");
+
+                    Actiuni a = new Actiuni(x[0], 0);
+                    for(int j = 1; j <= 10; j++)
+                        a.valori.add(Double.parseDouble(x[j]));
+
+                    actiuni.add(a);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             String fileCommans = "src/main/resources/" + args[2];
             String[] comanda = new String[100];
@@ -92,26 +101,102 @@ public class Main {
                     } else if (comanda[0].equals("ADD") && comanda[1].equals("ACCOUNT")) {
                         Utilizator u = cautaUtilizatorul(utilizatori, comanda[2]);
 
-                        u.adaugareCont(comanda[3]);
+                        Comanda c = new AdaugaContComanda(u,comanda[3]);
+                        coada.adaugaCoada(c);
 
                     } else if (comanda[0].equals("ADD") && comanda[1].equals("MONEY")) {
                         Utilizator u = cautaUtilizatorul(utilizatori, comanda[2]);
 
                         double suma = Double.parseDouble(comanda[4]);
 
-                        u.adaugareBani(comanda[3], (float) suma);
+                        Comanda c = new AdaugaBaniComanda(u, comanda[3], (float) suma);
+                        coada.adaugaCoada(c);
 
                     } else if (comanda[0].equals("EXCHANGE") && comanda[1].equals("MONEY")) {
                         Utilizator u = cautaUtilizatorul(utilizatori, comanda[2]);
 
                         double suma = Double.parseDouble(comanda[5]);
 
-                        u.adaugareBani(comanda[3], (float) suma);
+                        Comanda c = new AdaugaSchimbValutar(u, comanda[3], comanda[4], suma, valoare);
+                        coada.adaugaCoada(c);
+
+                    } else if (comanda[0].equals("TRANSFER") && comanda[1].equals("MONEY")) {
+                        coada.scosCoada();
+
+                        Utilizator u = cautaUtilizatorul(utilizatori, comanda[2]);
+                        Utilizator p = cautaUtilizatorul(u.prieteni, comanda[3]);
+
+                        if (p == null)
+                            throw new EroarePrietenNuExista(comanda[3]);
+
+                        double suma = Double.parseDouble(comanda[5]);
+
+                        Comanda c = new AdaugaTransferBani(u, p, comanda[4], suma);
+                        coada.adaugaCoada(c);
+
+                    } else if (comanda[0].equals("BUY") && comanda[1].equals("STOCKS")) {
+                        Utilizator u = cautaUtilizatorul(utilizatori, comanda[2]);
+
+                        for (Actiuni j : actiuni)
+                            if (j.numeCompanie.equals(comanda[3])) {
+                                double suma = j.valori.get(9);
+
+                                Comanda c = new AdaugaCumparaActiuni(u, suma, Integer.parseInt(comanda[4]), comanda[3]);
+                                coada.adaugaCoada(c);
+                            }
+
+                    } else if (comanda[0].equals("RECOMMEND") && comanda[1].equals("STOCKS")) {
+                        coada.scosCoada();
+
+                        System.out.print("{\"stocksToBuy\":[");
+                        double m1 = 0, m2 = 0;
+                        int k = 0, index = 0;
+
+                        //pentru prima comparie pe care o afisam
+                        while(k == 0) {
+                            m1 = 0;
+                            m2 = 0;
+
+                            for (int r = 0; r < 5; r++)
+                                m1 = m1 + actiuni.get(index).valori.get(r);
+                            m1 = m1 / 5;
+
+                            for (int r = 0; r < 10; r++)
+                                m2 = m2 + actiuni.get(index).valori.get(r);
+                            m2 = m2 / 10;
+
+                            if (m1 < m2) {
+                                System.out.print("\"" + actiuni.get(index).getNumeCompanie() + "\"");
+                                k = 1;
+                            }
+                            index++;
+                        }
+
+                        for (k = index; k < actiuni.size(); k ++) {
+                            m1 = 0;
+                            m2 = 0;
+                            for (int r = 0; r < 5; r++)
+                                m1 = m1 + actiuni.get(k).valori.get(r);
+                            m1 = m1 / 5;
+                            //System.out.println(m1);
+                            for (int r = 0; r < 10; r++)
+                                m2 = m2 + actiuni.get(k).valori.get(r);
+                            m2 = m2 / 10;
+
+                            if (m1 < m2)
+                                System.out.print(",\"" + actiuni.get(k).getNumeCompanie() + "\"");
+                        }
+                        System.out.println("]}");
 
                     }
                     else if (comanda[0].equals("LIST") && comanda[1].equals("USER")) {
+                        coada.scosCoada();
+
+                        int k = 0;
+
                         for (Utilizator u : utilizatori)
                             if (u.email.equals(comanda[2])) {
+                                k = 1;
                                 System.out.print("{\"email\":\"" + u.email + "\",\"firstname\":\"" + u.nume + "\",\"lastname\":\"" + u.prenume + "\",\"address\":\"" + u.adresa + "\",\"friends\":[");
                                 if (!u.prieteni.isEmpty()) {
                                     i = 0;
@@ -121,33 +206,49 @@ public class Main {
                                 }
                                 System.out.println("]}");
                             }
+
+                        if (k == 0)
+                            throw new EroareEmailNuExista(comanda[2]);
                     } else if (comanda[0].equals("LIST") && comanda[1].equals("PORTFOLIO")) {
+                        coada.scosCoada();
+
                         Utilizator u = cautaUtilizatorul(utilizatori, comanda[2]);
 
-                        System.out.print("{\"stocks\":[],");
-                        System.out.print("\"accounts\":[");
+                        DecimalFormat numar = new DecimalFormat("#0.00");
+
+
+                        System.out.print("{\"stocks\":[");
+                        if (!u.actiuni.isEmpty()) {
+                            i = 0;
+                            System.out.print("{\"stockName\":\"" + u.actiuni.get(0).getNumeCompanie() + "\",\"amount\":" + u.actiuni.get(0).getNrActiuni() + "}");
+
+                            for (i = 1; i < u.actiuni.size(); i++) {
+                                System.out.print(",{\"stockName\":\"" + u.actiuni.get(i).getNumeCompanie() + "\",\"amount\":" + u.actiuni.get(i).getNrActiuni() + "}");
+                            }
+                        }
+
+                        System.out.print("],\"accounts\":[");
                         if (!u.cont.isEmpty()) {
                             i = 0;
                             String tipCont = u.cont.get(0).getClass().getSimpleName().substring(0,3);
-                            System.out.print("{\"currencyName\":\"" + tipCont + "\",\"amount\":\"" + u.cont.get(0).getSuma() + "\"}");
+                            System.out.print("{\"currencyName\":\"" + tipCont + "\",\"amount\":\"" + numar.format(u.cont.get(0).getSuma()) + "\"}");
 
                             for (i = 1; i < u.cont.size(); i++) {
                                 tipCont = u.cont.get(i).getClass().getSimpleName().substring(0,3);
-                                System.out.print(",{\"currencyName\":\"" + tipCont + "\",\"amount\":\"" + u.cont.get(i).getSuma() + "\"}");
+                                System.out.print(",{\"currencyName\":\"" + tipCont + "\",\"amount\":\"" + numar.format(u.cont.get(i).getSuma()) + "\"}");
                             }
                         }
                         System.out.println("]}");
 
                     }
+//                    coada.scosCoada();
                 }
             } catch (IOException | EroareEmailExista e) {
                 e.printStackTrace();
-            } catch (EroareEmailNuExista e) {
-                throw new RuntimeException(e);
-            } catch (EroarePrietenExistent e) {
-                throw new RuntimeException(e);
-            } catch (EroareContExistent e) {
-                throw new RuntimeException(e);
+            } catch (EroarePrietenNuExista | EroarePrietenExistent e) {
+                System.out.println(e);
+            } catch (EroareContExistent | EroareEmailNuExista e) {
+                System.out.println(e);
             }
 
         }

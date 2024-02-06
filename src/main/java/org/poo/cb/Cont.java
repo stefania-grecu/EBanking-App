@@ -1,7 +1,6 @@
 package org.poo.cb;
 
 public class Cont {
-//    String tipValuta;
     double suma;
     public Cont(int suma) {
         this.suma = suma;
