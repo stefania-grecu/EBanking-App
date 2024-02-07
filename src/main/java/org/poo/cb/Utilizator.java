@@ -40,6 +40,8 @@ public class Utilizator {
 
     public void schimbValutar(String tipValutaSursa, String tipValuatDestinatie, double suma, String[][] valoare) throws EroareSumaInsuficienta {
         int s = 0, d = 0;
+        //aici m am gandit ca ar fi un fel de matrice
+        //pe prima coloana sa fie tipul valutei
         for (int v = 0; v < valoare[0].length; v++) {
             if(tipValutaSursa.equalsIgnoreCase(valoare[0][v]))
                 s = v;
@@ -63,7 +65,6 @@ public class Utilizator {
 
         sursa.suma = sursa.suma - sumaNoua;
         destinatie.suma = destinatie.suma + suma;
-
     }
 
     public void transferBani(Utilizator prieten, String tipValuta, double suma) throws EroareSumaInsuficientaTransfer {

@@ -82,23 +82,23 @@ public class Main {
                         utilizatori.add(u);
 
                     } else if (comanda[0].equals("ADD") && comanda[1].equals("FRIEND")) {
-                        Utilizator util = cautaUtilizatorul(utilizatori, comanda[3]);
-                        if (util == null)
+                        Utilizator u = cautaUtilizatorul(utilizatori, comanda[3]);
+                        if (u == null)
                             throw new EroareEmailNuExista(comanda[3]);
 
-                        util = cautaUtilizatorul(utilizatori, comanda[2]);
-                        if (util == null)
+                        u = cautaUtilizatorul(utilizatori, comanda[2]);
+                        if (u == null)
                             throw new EroareEmailNuExista(comanda[2]);
 
-                        Utilizator prieten = cautaUtilizatorul(util.prieteni, comanda[3]);
+                        Utilizator prieten = cautaUtilizatorul(u.prieteni, comanda[3]);
                         if (prieten != null)
                             throw new EroarePrietenExistent(comanda[3]);
 
                         //adaugare prieten
                         prieten = cautaUtilizatorul(utilizatori, comanda[3]);
-                        util.prieteni.add(prieten);
+                        u.prieteni.add(prieten);
                         assert prieten != null;
-                        prieten.prieteni.add(util);
+                        prieten.prieteni.add(u);
 
                     } else if (comanda[0].equals("ADD") && comanda[1].equals("ACCOUNT")) {
                         Utilizator u = cautaUtilizatorul(utilizatori, comanda[2]);
@@ -173,10 +173,11 @@ public class Main {
                         for (k = index; k < actiuni.size(); k ++) {
                             m1 = 0;
                             m2 = 0;
+
                             for (int r = 5; r < 10; r++)
                                 m1 = m1 + actiuni.get(k).valori.get(r);
                             m1 = m1 / 5;
-                            //System.out.println(m1);
+
                             for (int r = 0; r < 10; r++)
                                 m2 = m2 + actiuni.get(k).valori.get(r);
                             m2 = m2 / 10;
@@ -219,7 +220,6 @@ public class Main {
 
                         DecimalFormat numar = new DecimalFormat("#0.00");
 
-
                         System.out.print("{\"stocks\":[");
 
                         Iterator<Actiuni> iterator = u.actiuni.getIterator();
@@ -237,6 +237,7 @@ public class Main {
                         System.out.print("],\"accounts\":[");
                         if (!u.cont.isEmpty()) {
                             i = 0;
+                            //primele 3 litere din tipul contului
                             String tipCont = u.cont.get(0).getClass().getSimpleName().substring(0,3);
                             System.out.print("{\"currencyName\":\"" + tipCont + "\",\"amount\":\"" + numar.format(u.cont.get(0).getSuma()) + "\"}");
 
