@@ -25,4 +25,8 @@ public class Actiuni {
     public int getNrActiuni() {
         return nrActiuni;
     }
+
+    public void adaugaNrActiuni(int nrAdaugat) {
+        this.nrActiuni += nrAdaugat;
+    }
 }

@@ -9,29 +9,17 @@ public class Utilizator {
     ArrayList<Utilizator> prieteni;
     ArrayList<Cont> cont;
 
-    List<Actiuni> actiuni;
+    ActiuniContainer actiuni;
 
-    public Utilizator(String email, String nume, String prenume, String adresa) {
+    public Utilizator(String email, String nume, String prenume, String adresa, ArrayList<Actiuni> actiuni) {
         this.email = email;
         this.nume = nume;
         this.prenume = prenume;
         this.adresa = adresa;
         this.prieteni = new ArrayList<>();
         this.cont = new ArrayList<>();
-        this.actiuni = new ArrayList<>();
+        this.actiuni = new ActiuniContainer(actiuni);
     }
-
-//    public void adaugaComanda(Comanda comanda) {
-//        actiuni.add(comanda);
-//    }
-
-//    public void executaComenzi() {
-//        for (Comanda comanda : actiuni) {
-//            comanda.executa();
-//        }
-//        actiuni.clear();
-//    }
-
 
     public void adaugareCont(String tipValuta) throws EroareContExistent {
         ContFactory c = ContFactory.Instanta();
@@ -87,7 +75,7 @@ public class Utilizator {
             throw new EroareSumaInsuficientaTransfer(tipValuta);
 
         c.suma = c.suma - suma;
-        cp.suma =cp.suma + suma;
+        cp.suma = cp.suma + suma;
     }
 
     public void cumparareActiuni(double suma, int nrActiuni, String numeCompanie) throws EroareSumaInsuficientaActiuni {
@@ -99,14 +87,17 @@ public class Utilizator {
         if (suma * nrActiuni > c.getSuma())
             throw new EroareSumaInsuficientaActiuni();
 
-        if (!actiuni.isEmpty()) {
-            for (Actiuni r : actiuni) {
-                if (r.numeCompanie.equals(numeCompanie)) {
-                    r.nrActiuni = r.nrActiuni + nrActiuni;
-                    k = 1;
-                }
+        Iterator<Actiuni> iterator = actiuni.getIterator();
+
+        while (iterator.hasNext()) {
+            Actiuni a = iterator.next();
+
+            if (a.getNumeCompanie().equals(numeCompanie)) {
+                a.adaugaNrActiuni(nrActiuni);
+                k = 1;
             }
         }
+
         if (k == 0) {
             Actiuni a = new Actiuni(numeCompanie, nrActiuni);
             actiuni.add(a);

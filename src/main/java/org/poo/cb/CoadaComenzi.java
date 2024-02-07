@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CoadaComenzi {
-    private List<Comanda> coada = new ArrayList<>();
+    private final List<Comanda> coada = new ArrayList<>();
     public void adaugaCoada(Comanda comanda) {
         coada.add(comanda);
     }

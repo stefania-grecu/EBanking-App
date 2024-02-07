@@ -77,7 +77,8 @@ public class Main {
                         if (util != null)
                             throw new EroareEmailExista(comanda[2]);
 
-                        Utilizator u = new Utilizator(comanda[2], comanda[3], comanda[4], adresa);
+                        ArrayList<Actiuni> act = new ArrayList<>();
+                        Utilizator u = new Utilizator(comanda[2], comanda[3], comanda[4], adresa, act);
                         utilizatori.add(u);
 
                     } else if (comanda[0].equals("ADD") && comanda[1].equals("FRIEND")) {
@@ -96,6 +97,7 @@ public class Main {
                         //adaugare prieten
                         prieten = cautaUtilizatorul(utilizatori, comanda[3]);
                         util.prieteni.add(prieten);
+                        assert prieten != null;
                         prieten.prieteni.add(util);
 
                     } else if (comanda[0].equals("ADD") && comanda[1].equals("ACCOUNT")) {
@@ -121,8 +123,6 @@ public class Main {
                         coada.adaugaCoada(c);
 
                     } else if (comanda[0].equals("TRANSFER") && comanda[1].equals("MONEY")) {
-                        coada.scosCoada();
-
                         Utilizator u = cautaUtilizatorul(utilizatori, comanda[2]);
                         Utilizator p = cautaUtilizatorul(u.prieteni, comanda[3]);
 
@@ -146,10 +146,8 @@ public class Main {
                             }
 
                     } else if (comanda[0].equals("RECOMMEND") && comanda[1].equals("STOCKS")) {
-                        coada.scosCoada();
-
                         System.out.print("{\"stocksToBuy\":[");
-                        double m1 = 0, m2 = 0;
+                        double m1, m2;
                         int k = 0, index = 0;
 
                         //pentru prima comparie pe care o afisam
@@ -157,7 +155,7 @@ public class Main {
                             m1 = 0;
                             m2 = 0;
 
-                            for (int r = 0; r < 5; r++)
+                            for (int r = 5; r < 10; r++)
                                 m1 = m1 + actiuni.get(index).valori.get(r);
                             m1 = m1 / 5;
 
@@ -165,7 +163,7 @@ public class Main {
                                 m2 = m2 + actiuni.get(index).valori.get(r);
                             m2 = m2 / 10;
 
-                            if (m1 < m2) {
+                            if (m1 > m2) {
                                 System.out.print("\"" + actiuni.get(index).getNumeCompanie() + "\"");
                                 k = 1;
                             }
@@ -175,7 +173,7 @@ public class Main {
                         for (k = index; k < actiuni.size(); k ++) {
                             m1 = 0;
                             m2 = 0;
-                            for (int r = 0; r < 5; r++)
+                            for (int r = 5; r < 10; r++)
                                 m1 = m1 + actiuni.get(k).valori.get(r);
                             m1 = m1 / 5;
                             //System.out.println(m1);
@@ -183,15 +181,13 @@ public class Main {
                                 m2 = m2 + actiuni.get(k).valori.get(r);
                             m2 = m2 / 10;
 
-                            if (m1 < m2)
+                            if (m1 > m2)
                                 System.out.print(",\"" + actiuni.get(k).getNumeCompanie() + "\"");
                         }
                         System.out.println("]}");
 
                     }
                     else if (comanda[0].equals("LIST") && comanda[1].equals("USER")) {
-                        coada.scosCoada();
-
                         int k = 0;
 
                         for (Utilizator u : utilizatori)
@@ -209,21 +205,24 @@ public class Main {
 
                         if (k == 0)
                             throw new EroareEmailNuExista(comanda[2]);
-                    } else if (comanda[0].equals("LIST") && comanda[1].equals("PORTFOLIO")) {
-                        coada.scosCoada();
 
+                    } else if (comanda[0].equals("LIST") && comanda[1].equals("PORTFOLIO")) {
                         Utilizator u = cautaUtilizatorul(utilizatori, comanda[2]);
 
                         DecimalFormat numar = new DecimalFormat("#0.00");
 
 
                         System.out.print("{\"stocks\":[");
-                        if (!u.actiuni.isEmpty()) {
-                            i = 0;
-                            System.out.print("{\"stockName\":\"" + u.actiuni.get(0).getNumeCompanie() + "\",\"amount\":" + u.actiuni.get(0).getNrActiuni() + "}");
 
-                            for (i = 1; i < u.actiuni.size(); i++) {
-                                System.out.print(",{\"stockName\":\"" + u.actiuni.get(i).getNumeCompanie() + "\",\"amount\":" + u.actiuni.get(i).getNrActiuni() + "}");
+                        Iterator<Actiuni> iterator = u.actiuni.getIterator();
+
+                        if (iterator.hasNext()) {
+                            Actiuni a = iterator.next();
+                            System.out.print("{\"stockName\":\"" + a.getNumeCompanie() + "\",\"amount\":" + a.getNrActiuni() + "}");
+
+                            while (iterator.hasNext()) {
+                                a = iterator.next();
+                                System.out.print(",{\"stockName\":\"" + a.getNumeCompanie() + "\",\"amount\":" + a.getNrActiuni() + "}");
                             }
                         }
 
@@ -239,15 +238,12 @@ public class Main {
                             }
                         }
                         System.out.println("]}");
-
                     }
-//                    coada.scosCoada();
+                    coada.scosCoada();
                 }
             } catch (IOException | EroareEmailExista e) {
                 e.printStackTrace();
-            } catch (EroarePrietenNuExista | EroarePrietenExistent e) {
-                System.out.println(e);
-            } catch (EroareContExistent | EroareEmailNuExista e) {
+            } catch (EroarePrietenNuExista | EroarePrietenExistent | EroareContExistent | EroareEmailNuExista e) {
                 System.out.println(e);
             }
 
