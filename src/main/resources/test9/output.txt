@@ -1,4 +1,5 @@
-User with john.doe@email.com doesn't exist
-{"stocksToBuy":["GOOGL","JPM","ABNB","MSFT","COST","T","V","NFLX","META","GOOG","NVDA","BAC","KO","TMUS","CMCSA","PG","ADBE","AMZN","WMT"]}
-{"stocks":[{"stockName":"ADBE","amount":10},{"stockName":"ORCL","amount":100}],"accounts":[{"currencyName":"USD","amount":"33549.10"}]}
-fv
+{"stocks":[],"accounts":[{"currencyname":"usd","amount":"48410.00"},{"currencyname":"eur","amount":"1000.00"}]}
+{"stocks":[],"accounts":[{"currencyname":"usd","amount":"48310.00"},{"currencyname":"eur","amount":"1000.00"}]}
+{"stocks":[],"accounts":[{"currencyname":"usd","amount":"16510.00"},{"currencyname":"eur","amount":"21000.00"}]}
+{"stocks":[],"accounts":[{"currencyname":"usd","amount":"16510.00"},{"currencyname":"eur","amount":"21000.00"}]}
+{"stocks":[{"stockname":"orcl","amount":100}],"accounts":[{"currencyname":"usd","amount":"6557.80"},{"currencyname":"eur","amount":"21000.00"}]}

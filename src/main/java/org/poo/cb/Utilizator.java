@@ -104,20 +104,30 @@ public class Utilizator {
             actiuni.add(a);
         }
 
-        suma = suma * nrActiuni;
-        c.suma = c.suma - suma;
+        Context context;
+        double s;
+
+        if (!x)
+            context = new Context(new StrategieNormala());
+        else
+            context = new Context(new StrategiePremium());
+
+        s = context.executeStrategie(suma, nrActiuni);
+        c.suma = c.suma - s;
     }
 
     public void premium() throws EroareSumaInsuficientaPremium {
-        Cont c = null;
+        if (!x) {
+            Cont c = null;
 
-        c = cautareCont(cont, "USD", c);
+            c = cautareCont(cont, "USD", c);
 
-        if (100 > c.getSuma())
-            throw new EroareSumaInsuficientaPremium();
+            if (100 > c.getSuma())
+                throw new EroareSumaInsuficientaPremium();
 
-        c.suma = c.suma - 100;
-        x = true;
+            c.suma = c.suma - 100;
+            x = true;
+        }
     }
 
     private Cont cautareCont(ArrayList<Cont> cont, String tipValuta, Cont c) {

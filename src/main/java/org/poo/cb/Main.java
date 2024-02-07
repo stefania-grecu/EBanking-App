@@ -190,7 +190,7 @@ public class Main {
                         Utilizator u = cautaUtilizatorul(utilizatori, comanda[2]);
 
                         if (u == null)
-                            throw new EroareEmailNuExista(comanda[3]);
+                            throw new EroareEmailNuExista(comanda[2]);
 
                         Comanda c = new AdaugaOptiunePremium(u);
                         coada.adaugaCoada(c);
