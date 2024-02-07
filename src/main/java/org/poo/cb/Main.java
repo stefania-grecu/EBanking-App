@@ -186,8 +186,16 @@ public class Main {
                         }
                         System.out.println("]}");
 
-                    }
-                    else if (comanda[0].equals("LIST") && comanda[1].equals("USER")) {
+                    }  else if (comanda[0].equals("BUY") && comanda[1].equals("PREMIUM")) {
+                        Utilizator u = cautaUtilizatorul(utilizatori, comanda[2]);
+
+                        if (u == null)
+                            throw new EroareEmailNuExista(comanda[3]);
+
+                        Comanda c = new AdaugaOptiunePremium(u);
+                        coada.adaugaCoada(c);
+
+                    } else if (comanda[0].equals("LIST") && comanda[1].equals("USER")) {
                         int k = 0;
 
                         for (Utilizator u : utilizatori)

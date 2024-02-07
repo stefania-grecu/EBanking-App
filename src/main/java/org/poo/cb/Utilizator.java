@@ -8,8 +8,8 @@ public class Utilizator {
     String email, nume, prenume, adresa;
     ArrayList<Utilizator> prieteni;
     ArrayList<Cont> cont;
-
     ActiuniContainer actiuni;
+    boolean x;
 
     public Utilizator(String email, String nume, String prenume, String adresa, ArrayList<Actiuni> actiuni) {
         this.email = email;
@@ -19,6 +19,7 @@ public class Utilizator {
         this.prieteni = new ArrayList<>();
         this.cont = new ArrayList<>();
         this.actiuni = new ActiuniContainer(actiuni);
+        this.x = false;
     }
 
     public void adaugareCont(String tipValuta) throws EroareContExistent {
@@ -57,7 +58,7 @@ public class Utilizator {
         if (sumaNoua > sursa.getSuma())
             throw new EroareSumaInsuficienta(tipValutaSursa);
 
-        if (sumaNoua > (sursa.suma / 2))
+        if (sumaNoua > (sursa.suma / 2) && !x)
             sursa.suma = sursa.suma - sumaNoua/100;
 
         sursa.suma = sursa.suma - sumaNoua;
@@ -105,6 +106,18 @@ public class Utilizator {
 
         suma = suma * nrActiuni;
         c.suma = c.suma - suma;
+    }
+
+    public void premium() throws EroareSumaInsuficientaPremium {
+        Cont c = null;
+
+        c = cautareCont(cont, "USD", c);
+
+        if (100 > c.getSuma())
+            throw new EroareSumaInsuficientaPremium();
+
+        c.suma = c.suma - 100;
+        x = true;
     }
 
     private Cont cautareCont(ArrayList<Cont> cont, String tipValuta, Cont c) {
